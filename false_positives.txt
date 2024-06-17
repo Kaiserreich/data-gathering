@@ -1,0 +1,24 @@
+is_ally_with country is not valid
+Error in front for order
+AI tried to post an invalid command
+called GetOccupationLaw with no occupatin data
+Dropped command
+Failed to seed operation phase! This might happen because none of the phase requirements could be met
+No font with name
+Missing sound effect
+does not have resistance
+already has a resistance
+Tried to transfer a negative amount of convoys to another system
+Failed to create orders group
+No unit leader could be deduced from scope nor target
+(filename not available)
+[PDX NAKAMA]
+Failed to load global statistics
+does not occupy
+government_scripted_triggers.txt:192
+government_scripted_triggers.txt:193
+lines omitted
+Stack trace
+Removing combat during combat update
+remove_wargoal: Did not remove wargoal
+Important assertion failed
