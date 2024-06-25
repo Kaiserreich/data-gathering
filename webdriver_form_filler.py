@@ -543,7 +543,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'Ireland removes Ulster Privileges', i):
                 game_results["Did Ireland remove the Ulster Privileges?"] = "Yes"
 
-            elif m := re.match(r';HNN Power Struggle - (.*)', i):
+            elif m := re.match(r'HNN Power Struggle - (.*)', i):
                 game_results["Hunan's Power Struggle"] = m.group(1)
 
     except Exception as ex:
