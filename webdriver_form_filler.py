@@ -544,7 +544,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["Did Ireland remove the Ulster Privileges?"] = "Yes"
 
             elif m := re.match(r'HNN Power Struggle - (.*)', i):
-                game_results["Hunan's Power Struggle"] = m.group(1)
+                game_results["Hunan Power Struggle"] = m.group(1)
 
     except Exception as ex:
         logging.error(f"Error while parsing the data and preparing questions {ex}", exc_info=True)
@@ -597,7 +597,14 @@ def fill_google_form(args):
         options = Options()
         options.add_argument("--lang=en-GB")
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install(), options=options))
+        driver_path = ChromeDriverManager().install()
+        if driver_path:
+            driver_name = driver_path.split('/')[-1]
+            if driver_name != "chromedriver":
+                driver_path = "/".join(driver_path.split('/')[:-1]+["chromedriver.exe"]).replace('/', '\\')
+                os.chmod(driver_path, 0o755)
+        browser = webdriver.Chrome(service=ChromeService(driver_path, options=options))
+        # browser = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install(), options=options))
         browser.get(config_data["form_link"])
         WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.XPATH, BUTTON_SEND)))                       # Timeout until the page is loaded
         # WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CSS_SELECTOR, "input")))
