@@ -128,6 +128,8 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "If Ireland willingly joins a faction, what faction do they join?": "Ireland never joined a faction",
             "If Ireland gets a guarantee, who is it from?": "Ireland did not get a guarantee",
             "Did Ireland remove the Ulster Privileges?": "No",
+            "What path did Russia take?": "No path was decided on",
+            "Did Fengtians Unification Conference succeed?": "Did not happen"
         }
 
         config_data = read_config_file()
@@ -472,8 +474,8 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["Who won the Xinjiang Civil War?"] = m.group(1)
                 game_results["When did the Xinjiang Civil War end?"] = log_data[m.group(0)].year if log_data[m.group(0)] < datetime.fromisoformat("1946-01-01") else "After 1945"
 
-            elif m := re.match(r'.* NORTHWESTERN WAR', i):
-                game_results["Who won the Northwestern War?"] = "Mongolia and Tibet" if "MA LOSES NORTHWESTERN WAR" in log_data.keys() else "Ma Clique"
+            elif m := re.match(r'NORTHWESTERN WAR RESULT - (.*)', i):
+                game_results["Who won the Northwestern War?"] = m.group(1)
                 game_results["When did the Northwestern War end?"] = log_data[m.group(0)].year if log_data[m.group(0)] < datetime.fromisoformat("1946-01-01") else "After 1945"
 
             elif m := re.match(r'(.*) WINS LEP WAR', i):
@@ -494,6 +496,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 else:
                     game_results["When did the League War end?"] = "1938 or later"
 
+            elif m := re.match(r'FENGTIAN UNIFICATION CONFERENCE RESULT - (.*)', i):
+                game_results["Did Fengtians Unification Conference succeed?"] = m.group(1)
+
             elif m := re.match(r'GXC CIVIL WAR WINNER - (.*)', i):
                 game_results["Did the GXC civil war happen?"] = "Yes"
                 game_results["Who won the GXC civil war?"] = m.group(1)
@@ -502,7 +507,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'GXC CIVIL WAR AVOIDED - (.*)', i):
                 game_results["Did the GXC civil war happen?"] = f"Avoided - {m.group(1)}"
 
-            elif m := re.match(r'RUS POLITICAL PATH - (.*)', i):
+            elif m := re.match(r'RUSSIA POLITICAL PATH - (.*)', i):
                 game_results["What path did Russia take?"] = m.group(1)
 
             elif m := re.match(r'(.*) REVOLTS AGAINST OTT', i):
@@ -539,6 +544,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'Ireland joins (.*)', i):
                 game_results["If Ireland willingly joins a faction, what faction do they join?"] = m.group(1)
+
+            elif m := re.match(r'(.*) guarantees Ireland', i):
+                game_results["If Ireland gets a guarantee, who is it from?"] = f"{m.group(1)} guarantees Ireland"
 
             elif m := re.match(r'Ireland removes Ulster Privileges', i):
                 game_results["Did Ireland remove the Ulster Privileges?"] = "Yes"
