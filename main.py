@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 import glob
+import re
 
 import psutil
 import webdriver_form_filler as wdff
@@ -47,6 +48,7 @@ FALSE_POSITIVE_LINES = read_input_file(filename="false_positives.txt")  # list w
 # 1.2 Paths
 HOI_PATH = config["hoi4_exe_fullpath"]                                 # Path to hoi4 exe
 LOGS_PATH = f"{os.environ.get('USERPROFILE')}\\Documents\\Paradox Interactive\\Hearts of Iron IV\\logs" if "custom_logs_path" not in config.keys() else config["custom_logs_path"]
+PATH_TO_SETTINGS = f"{os.environ.get('USERPROFILE')}\\Documents\\Paradox Interactive\\Hearts of Iron IV\\settings.txt"
 
 # 1.3 Hoi4 args
 ENABLE_CRASH_LOGGING = config["crash_logging"]                         # hoi4 arg
@@ -83,7 +85,7 @@ def launch_the_game(run: int, instance: int, cpu_affinity: list):
     Returns:
         game (obj): Game process object. Used to kill it later
     """
-    game_setup = f'{HOI_PATH} -nolauncher {"-hands_off" if ENABLE_HANDS_OFF else "-debug_smooth=no -start_tag=BHU -start_speed=4"} {"-crash_data_log" if ENABLE_CRASH_LOGGING else ""} {"-debug" if ENABLE_DEBUG_MODE else ""} -historical=no -logpostfix=_{instance}'
+    game_setup = f'{HOI_PATH} -nolauncher -debug_smooth=no -start_minimized {"-hands_off" if ENABLE_HANDS_OFF else "-start_tag=BHU -start_speed=4"} {"-crash_data_log" if ENABLE_CRASH_LOGGING else ""} {"-debug" if ENABLE_DEBUG_MODE else ""} -historical=no -logpostfix=_{instance}'
     game = subprocess.Popen(game_setup)
     process_id = game.pid
     game_process = psutil.Process(pid=process_id)
@@ -128,9 +130,72 @@ def copy_log_file(run: int, instance: int, log_type: str):
         return error_log_path
 
 
+def change_game_settings():
+    MIN_SETTINGS = {
+        'size': '{ x=1024 y=768 }',
+        'max_refresh_rate': '30',
+        'fullScreen': 'no',
+        'borderless': 'no',
+        'shadows': 'no',
+        'multi_sampling': '0',
+        'maxanisotropy': '0',
+        'vsync': 'no',
+        'master_volume': '0',
+        'draw_trees': 'no',
+        'draw_rivers': 'no',
+        'draw_postfx': 'no',
+        'draw_hires_terrain': 'no',
+        'draw_citysprawl': 'no',
+        'draw_shadows': 'no',
+        'draw_weather_effects': 'no',
+        'draw_water_reflections': 'no',
+        'draw_units': 'no',
+        'draw_buildings': 'no',
+        'high_gfx_shaders': 'no',
+        'draw_map_full_res': 'no',
+        'texture_quality': '0',
+        'hide_daynight_cycle': 'yes',
+        'autosave': '"NEVER"',
+    }
+
+    with open(PATH_TO_SETTINGS, 'r', encoding='utf-8') as text_file:
+        settings_file = text_file.read()
+        changed_settings_file = settings_file
+        backup_file = settings_file
+        for key in MIN_SETTINGS.keys():
+            try:
+                pattern = key + r'=(.*)'
+                value = re.findall(pattern, settings_file)[0]
+                changed_settings_file = changed_settings_file.replace(key + '=' + value, key + '=' + MIN_SETTINGS[key])
+            except Exception:
+                print(f"Setting {key} is missing")
+                logging.info(f"Setting {key} is missing")
+                continue
+
+    with open(PATH_TO_SETTINGS, 'w', encoding='utf-8') as text_file_write:
+        text_file_write.write(changed_settings_file)
+
+    with open(PATH_TO_SETTINGS, 'r', encoding='utf-8') as text_file:
+        settings_file = text_file.read()
+        print(settings_file)
+
+    print('Game settings changed')
+    logging.info('Game settings changed')
+    return backup_file
+
+
+def revert_game_settings(backup_file: str):
+    with open(PATH_TO_SETTINGS, 'w', encoding='utf-8') as text_file_write:
+        text_file_write.write(backup_file)
+
+    print('Game settings reverted')
+    logging.info('Game settings reverted')
+
+
 def main():
     print("Hoi4 launch script/form filler by Pelmen#2920. Make sure you set correct paths in config file. Starting the script...\n\n")
     if generate_logs:
+        backup_settings = change_game_settings()
         for run in range(1, TIMES_TO_LAUNCH + 1):
             try:
                 game_processes_list = []
@@ -157,6 +222,8 @@ def main():
                     logging.error(ex)
                     print(ex)
                     continue
+
+        revert_game_settings(backup_file=backup_settings)
 
     if publish_to_google_form:
         try:
