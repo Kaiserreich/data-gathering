@@ -1,5 +1,5 @@
 {
-    "generate_logs": false,
+    "generate_logs": true,
     "hoi4_exe_fullpath": "C:\\SteamLibrary\\steamapps\\common\\Hearts of Iron IV\\hoi4.exe",
     "crash_logging": false,
     "debug_mode": false,
@@ -10,7 +10,7 @@
     "num_of_threads_per_exe": 4,
 
     "publish_to_google_form": true,
-    "form_link": "https://docs.google.com/forms/d/e/1FAIpQLScbZ1Rt6_FHb-9B0EiSzXLHncjNkMDoUdbtpaXbfKh7_TgRRw/viewform",
+    "form_link": "https://docs.google.com/forms/d/e/1FAIpQLSdudIO_9R9DFxyQSZKFLK4SsxChtexiZJ2_nR9YHZJPReNG_Q/viewform",
     "discord_nickname": "Pelmen",
     "role": "Contributor",
     "form_autosubmit": true,

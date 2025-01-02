@@ -11,6 +11,8 @@ pytest = "*"
 auto-py-to-exe = "*"
 brotlipy = "*"
 cffi = "*"
+pygetwindow = "*"
+pywin32 = "*"
 
 [dev-packages]
 

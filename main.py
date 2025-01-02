@@ -9,9 +9,12 @@ import sys
 import time
 import glob
 import re
+from pathlib import Path
 
 import psutil
 import webdriver_form_filler as wdff
+import pygetwindow as gw
+import win32process
 
 # Configuration and reading files
 logging.basicConfig(filename='loop_script.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filemode='w')
@@ -21,10 +24,10 @@ APPLICATION_PATH = os.path.dirname(sys.executable) if getattr(sys, 'frozen', Fal
 def read_input_file(filename: str) -> dict:
     try:
         if ".json" in filename:
-            with open(f"{APPLICATION_PATH}\\{filename}", 'r') as file:
+            with open(Path(APPLICATION_PATH) / filename, 'r') as file:
                 return json.loads(file.read())
         elif ".txt" in filename:
-            with open(f"{APPLICATION_PATH}\\{filename}", 'r') as file:
+            with open(Path(APPLICATION_PATH) / filename, 'r') as file:
                 return file.read().split('\n')
     except Exception as ex:
         print(ex)
@@ -47,8 +50,9 @@ FALSE_POSITIVE_LINES = read_input_file(filename="false_positives.txt")  # list w
 
 # 1.2 Paths
 HOI_PATH = config["hoi4_exe_fullpath"]                                 # Path to hoi4 exe
-LOGS_PATH = f"{os.environ.get('USERPROFILE')}\\Documents\\Paradox Interactive\\Hearts of Iron IV\\logs" if "custom_logs_path" not in config.keys() else config["custom_logs_path"]
-PATH_TO_SETTINGS = f"{os.environ.get('USERPROFILE')}\\Documents\\Paradox Interactive\\Hearts of Iron IV\\settings.txt"
+LOGS_PATH = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "logs" if "custom_logs_path" not in config.keys() else config["custom_logs_path"]
+PATH_TO_SETTINGS = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "settings.txt" if "custom_settings_path" not in config.keys() else config["custom_settings_path"]
+PATH_TO_PDX_SETTINGS = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "pdx_settings.txt" if "custom_pdx_settings_path" not in config.keys() else config["custom_pdx_settings_path"]
 
 # 1.3 Hoi4 args
 ENABLE_CRASH_LOGGING = config["crash_logging"]                         # hoi4 arg
@@ -64,7 +68,7 @@ else:
 
 # 2 - Process logs and send data to google forms
 publish_to_google_form = config["publish_to_google_form"]
-raw_backup_files_path = f"{APPLICATION_PATH}\\game_log_files\\backup"
+raw_backup_files_path = Path(APPLICATION_PATH) / "game_log_files" / "backup"
 
 # 3 - Additionally clean generated error.log files if needed
 if "clean_error_log_files" in config.keys():
@@ -121,18 +125,19 @@ def process_error_log(filepath):
 
 def copy_log_file(run: int, instance: int, log_type: str):
     if log_type == "game_log":
-        shutil.copyfile(f"{LOGS_PATH}\\game_{instance}.log", f"{APPLICATION_PATH}\\game_log_files\\game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log")
-        shutil.copyfile(f"{LOGS_PATH}\\game_{instance}.log", f"{APPLICATION_PATH}\\error_log_files\\game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log")
+        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'game_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log')
+        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'error_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log')
     elif log_type == "error_log":
         error_log_name = f"error_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log"
-        error_log_path = f"{APPLICATION_PATH}\\error_log_files\\{error_log_name}"
-        shutil.copyfile(f"{LOGS_PATH}\\error_{instance}.log", error_log_path)
+        error_log_path = Path(APPLICATION_PATH) / 'error_log_files' / error_log_name
+        shutil.copyfile(Path(LOGS_PATH) / f'error_{instance}.log', error_log_path)
         return error_log_path
 
 
 def change_game_settings():
     MIN_SETTINGS = {
-        'size': '{ x=1024 y=768 }',
+        'size': '{ x=320 y=240 }',
+        'gui_scale': '2',
         'max_refresh_rate': '30',
         'fullScreen': 'no',
         'borderless': 'no',
@@ -175,33 +180,83 @@ def change_game_settings():
     with open(PATH_TO_SETTINGS, 'w', encoding='utf-8') as text_file_write:
         text_file_write.write(changed_settings_file)
 
-    with open(PATH_TO_SETTINGS, 'r', encoding='utf-8') as text_file:
-        settings_file = text_file.read()
-        print(settings_file)
-
     print('Game settings changed')
     logging.info('Game settings changed')
     return backup_file
 
 
-def revert_game_settings(backup_file: str):
-    with open(PATH_TO_SETTINGS, 'w', encoding='utf-8') as text_file_write:
+def change_pdx_game_settings():
+    MIN_SETTINGS = {
+        '"windowed_resolution"': 'value="320x240"',
+    }
+
+    with open(PATH_TO_PDX_SETTINGS, 'r', encoding='utf-8') as text_file:
+        settings_file = text_file.read()
+        changed_settings_file = settings_file
+        backup_file = settings_file
+        for key in MIN_SETTINGS:
+            try:
+                pattern = re.findall(key + r'=\{.*?\}', settings_file, flags=re.MULTILINE | re.DOTALL)[0]
+                value = re.findall(r'value.*', pattern)[0]
+                changed_settings_file = changed_settings_file.replace(pattern, pattern.replace(value, MIN_SETTINGS[key]))
+            except Exception:
+                print(f"Setting {key} is missing")
+                logging.info(f"Setting {key} is missing")
+                continue
+
+    with open(PATH_TO_PDX_SETTINGS, 'w', encoding='utf-8') as text_file_write:
+        text_file_write.write(changed_settings_file)
+
+    print('Screen resolution changed')
+    logging.info('Screen resolution changed')
+    return backup_file
+
+
+def revert_game_settings(backup_file: str, path: str):
+    with open(path, 'w', encoding='utf-8') as text_file_write:
         text_file_write.write(backup_file)
 
     print('Game settings reverted')
     logging.info('Game settings reverted')
 
 
+def minimize_window(game_processes: list[subprocess.Popen]):
+    # Check if the platform is Windows
+    if os.name == 'nt':  # Windows
+
+        # Get process IDs
+        pids = [i.pid for i in game_processes]
+
+        # Find windows corresponding to each PID
+        windows = gw.getAllWindows()    # Get all open windows (no title filter)
+        for window in windows:
+            try:
+                hwnd = window._hWnd  # Get the window handle (HWND)
+                # Get the PID associated with the window handle (HWND)
+                _, pid = win32process.GetWindowThreadProcessId(hwnd)
+
+                if pid in pids:
+                    window.minimize()
+            except psutil.NoSuchProcess:
+                # Handle any potential error where the process doesn't exist
+                print("Window minimize failed")
+                continue
+
+
 def main():
     print("Hoi4 launch script/form filler by Pelmen#2920. Make sure you set correct paths in config file. Starting the script...\n\n")
     if generate_logs:
         backup_settings = change_game_settings()
+        backup_pdx_settings = change_pdx_game_settings()
         for run in range(1, TIMES_TO_LAUNCH + 1):
             try:
                 game_processes_list = []
 
                 for instance in range(NUM_OF_INSTANCES):                                                        # 1. Launch all games
                     game_processes_list.append(launch_the_game(run, instance, CPU_AFFINITIES_LIST[instance]))
+
+                time.sleep(10)
+                minimize_window(game_processes_list)                                                            # 1.01 Minimize opened windows
                 time.sleep(GAME_DURATION)
 
                 for game in game_processes_list:                                                                # 1.1. Kill all games
@@ -223,11 +278,14 @@ def main():
                     print(ex)
                     continue
 
-        revert_game_settings(backup_file=backup_settings)
+        revert_game_settings(backup_file=backup_settings, path=PATH_TO_SETTINGS)
+        revert_game_settings(backup_file=backup_pdx_settings, path=PATH_TO_PDX_SETTINGS)
 
     if publish_to_google_form:
         try:
-            for filename in glob.iglob(APPLICATION_PATH + '\\game_log_files\\game**.log'):
+            path = Path(APPLICATION_PATH) / 'game_log_files'
+            path = str(path / 'game**.log')
+            for filename in glob.iglob(path):
                 print(f"{time.strftime('%H:%M', time.localtime())} - Processing {os.path.basename(filename)}")
                 with open(filename, 'r', encoding='utf-8-sig') as file:
                     log_file = file.read().split('\n')                                                           # Extract lines from game.log
@@ -247,10 +305,14 @@ def main():
             print(ex)
 
     if clean_error_log_files:
+        print('Cleaning up error.log files')
+        logging.info('Cleaning up error.log files')
         try:
-            for filename in glob.iglob(APPLICATION_PATH + '\\error_log_files\\error**.log'):
-                print(f"{time.strftime('%H:%M', time.localtime())} - Processing {os.path.basename(filename)}")
-                process_error_log(filename)
+            path = Path(APPLICATION_PATH) / 'error_log_files'
+            path = str(path / 'error**.log')
+            for filepath in glob.iglob(path):
+                print(f"{time.strftime('%H:%M', time.localtime())} - Processing {os.path.basename(filepath)}")
+                process_error_log(filepath)
         except Exception as ex:
             logging.error(ex)
             print(ex)

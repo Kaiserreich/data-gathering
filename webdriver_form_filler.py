@@ -14,6 +14,7 @@ import json                                                       # Work with co
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 # from brotli import compress
 # import _cffi_backend
 
@@ -35,7 +36,7 @@ def read_config_file() -> dict:
         application_path = os.path.dirname(sys.executable)
     elif __file__:
         application_path = os.path.dirname(__file__)
-    with open(f"{application_path}\\config.json", 'r') as file:
+    with open(Path(application_path) / 'config.json', 'r') as file:
         json_obj = file.read()
     return json.loads(json_obj)
 
