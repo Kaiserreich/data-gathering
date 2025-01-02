@@ -158,7 +158,7 @@ def change_game_settings():
         'draw_buildings': 'no',
         'high_gfx_shaders': 'no',
         'draw_map_full_res': 'no',
-        'texture_quality': '0',
+        'texture_quality': '2',
         'hide_daynight_cycle': 'yes',
         'autosave': '"NEVER"',
     }
