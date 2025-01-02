@@ -137,7 +137,6 @@ def copy_log_file(run: int, instance: int, log_type: str):
 def change_game_settings():
     MIN_SETTINGS = {
         'size': '{ x=320 y=240 }',
-        'gui_scale': '2',
         'max_refresh_rate': '30',
         'fullScreen': 'no',
         'borderless': 'no',
