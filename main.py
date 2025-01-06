@@ -160,6 +160,7 @@ def change_game_settings():
         'texture_quality': '2',
         'hide_daynight_cycle': 'yes',
         'autosave': '"NEVER"',
+        'pause_on_popups': 'no',
     }
 
     with open(PATH_TO_SETTINGS, 'r', encoding='utf-8') as text_file:
