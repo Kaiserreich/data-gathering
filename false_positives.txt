@@ -15,10 +15,12 @@ No unit leader could be deduced from scope nor target
 [PDX NAKAMA]
 Failed to load global statistics
 does not occupy
-government_scripted_triggers.txt:192
-government_scripted_triggers.txt:193
 lines omitted
 Stack trace
 Removing combat during combat update
 remove_wargoal: Did not remove wargoal
 Important assertion failed
+diplomatic_relation: The relation(
+is in script enum
+Scope is not a valid character
+Could not obtain cloud file
