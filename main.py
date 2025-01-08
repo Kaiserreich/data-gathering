@@ -69,6 +69,7 @@ else:
 # 2 - Process logs and send data to google forms
 publish_to_google_form = config["publish_to_google_form"]
 raw_backup_files_path = Path(APPLICATION_PATH) / "game_log_files" / "backup"
+exception_path = Path(APPLICATION_PATH) / "game_log_files" / "exception"
 
 # 3 - Additionally clean generated error.log files if needed
 if "clean_error_log_files" in config.keys():
@@ -289,7 +290,6 @@ def main():
                 print(f"{time.strftime('%H:%M', time.localtime())} - Processing {os.path.basename(filename)}")
                 with open(filename, 'r', encoding='utf-8-sig') as file:
                     log_file = file.read().split('\n')                                                           # Extract lines from game.log
-
                     x = {line.split(";")[1]: line.split(";")[2] for line in log_file if "KR_Event_Logging" in line}
                     data_to_report = dict(sorted(x.items(), key=lambda item: item[1][-4:]))                     # Sort log dict to get correct ending date
                     data_to_report["END"] = list(data_to_report.values())[-1]
@@ -297,10 +297,13 @@ def main():
                     for key, value in data_to_report.items():
                         if "_data" not in key:
                             print("\t\t{: <40} {: <40}".format(key, value))                                      # Print info in console
-
+                try:
                     wdff.fill_google_form(wdff.extract_data_for_webdriver_script(log_data=data_to_report))       # Send logs to forms
-
-                shutil.move(filename, raw_backup_files_path)
+                    shutil.move(filename, raw_backup_files_path)
+                except wdff.DateException:
+                    print(filename)
+                    shutil.move(filename, exception_path)
+                    
         except Exception as ex:
             print(ex)
 
