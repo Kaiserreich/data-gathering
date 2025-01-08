@@ -23,8 +23,8 @@ WEBDRIVER_SCRIPT_AUTOSEND_FORM = False
 BUTTON_SEND = "(//form//div[@data-shuffle-seed]//div[@role='button'])[1]"
 
 logging.basicConfig(filename='selenium_script.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filemode='w')
-logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))
 
+# DateException is used so that generic exceptions get caught by the catch-all instead of being treated as short logs
 class DateException(Exception):
     pass
 
@@ -149,9 +149,8 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             if config_data.get("form_autosubmit") is True:
                 WEBDRIVER_SCRIPT_AUTOSEND_FORM = True
     except DateException:
-        logging.warning("Log too short (pre-1944). This may have happened because your time limit was too short, the game crashed, or something else funny happened. If you're sure it's not the first one, please report to #data-gathering")
-        logging.warning("Skipping and saving to exceptional log directory...")
-        raise DateException
+        print("Log too short (pre-1944). This may have happened because your time limit was too short, the game crashed, or something else funny happened. If you're sure it's not the first one, please report to #data-gathering")
+        raise DateException # raising this here so it gets caught the caller in main.py and pass to the right handler
     except Exception as ex:
         logging.error(f"Error while creating initial dict before parsing the data {ex}", exc_info=True)
         raise
