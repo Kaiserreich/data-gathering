@@ -301,7 +301,7 @@ def main():
                     wdff.fill_google_form(wdff.extract_data_for_webdriver_script(log_data=data_to_report))       # Send logs to forms
                     shutil.move(filename, raw_backup_files_path)
                 except wdff.DateException:
-                    print(filename)
+                    print("Skipping and saving to exceptional log directory...")
                     shutil.move(filename, exception_path)
                     
         except Exception as ex:
