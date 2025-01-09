@@ -303,7 +303,7 @@ def main():
                 except wdff.DateException:
                     print("Skipping and saving to exceptional log directory...")
                     shutil.move(filename, exception_path)
-                    
+
         except Exception as ex:
             print(ex)
 
