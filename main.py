@@ -53,6 +53,10 @@ HOI_PATH = config["hoi4_exe_fullpath"]                                 # Path to
 LOGS_PATH = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "logs" if "custom_logs_path" not in config.keys() else config["custom_logs_path"]
 PATH_TO_SETTINGS = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "settings.txt" if "custom_settings_path" not in config.keys() else config["custom_settings_path"]
 PATH_TO_PDX_SETTINGS = Path(os.environ.get('USERPROFILE')) / "Documents" / "Paradox Interactive" / "Hearts of Iron IV" / "pdx_settings.txt" if "custom_pdx_settings_path" not in config.keys() else config["custom_pdx_settings_path"]
+RAW_BACKUP_FILES_PATH = Path(APPLICATION_PATH) / "game_log_files" / "backup"
+EXCEPTION_PATH = Path(APPLICATION_PATH) / "game_log_files" / "exception"
+ERROR_LOG_PATH = Path(APPLICATION_PATH) / "error_log_files"
+
 
 # 1.3 Hoi4 args
 ENABLE_CRASH_LOGGING = config["crash_logging"]                         # hoi4 arg
@@ -68,8 +72,6 @@ else:
 
 # 2 - Process logs and send data to google forms
 publish_to_google_form = config["publish_to_google_form"]
-raw_backup_files_path = Path(APPLICATION_PATH) / "game_log_files" / "backup"
-exception_path = Path(APPLICATION_PATH) / "game_log_files" / "exception"
 
 # 3 - Additionally clean generated error.log files if needed
 if "clean_error_log_files" in config.keys():
@@ -244,9 +246,16 @@ def minimize_window(game_processes: list[subprocess.Popen]):
                 continue
 
 
+def generate_folder_structure():
+    RAW_BACKUP_FILES_PATH.mkdir(parents=True, exist_ok=True)
+    EXCEPTION_PATH.mkdir(parents=True, exist_ok=True)
+    ERROR_LOG_PATH.mkdir(parents=True, exist_ok=True)
+
+
 def main():
     print("Hoi4 launch script/form filler by Pelmen#2920. Make sure you set correct paths in config file. Starting the script...\n\n")
     if generate_logs:
+        generate_folder_structure()
         backup_settings = change_game_settings()
         backup_pdx_settings = change_pdx_game_settings()
         for run in range(1, TIMES_TO_LAUNCH + 1):
@@ -299,10 +308,10 @@ def main():
                             print("\t\t{: <40} {: <40}".format(key, value))                                      # Print info in console
                 try:
                     wdff.fill_google_form(wdff.extract_data_for_webdriver_script(log_data=data_to_report))       # Send logs to forms
-                    shutil.move(filename, raw_backup_files_path)
+                    shutil.move(filename, RAW_BACKUP_FILES_PATH)
                 except wdff.DateException:
                     print("Skipping and saving to exceptional log directory...")
-                    shutil.move(filename, exception_path)
+                    shutil.move(filename, EXCEPTION_PATH)
 
         except Exception as ex:
             print(ex)
