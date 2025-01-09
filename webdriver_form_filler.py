@@ -24,9 +24,15 @@ BUTTON_SEND = "(//form//div[@data-shuffle-seed]//div[@role='button'])[1]"
 
 logging.basicConfig(filename='selenium_script.log', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', filemode='w')
 
-# DateException is used so that generic exceptions get caught by the catch-all instead of being treated as short logs
+
 class DateException(Exception):
+    """DateException is used so that generic exceptions get caught by the catch-all instead of being treated as short logs
+
+    Args:
+        Exception (_type_): _description_
+    """
     pass
+
 
 def read_config_file() -> dict:
     """
@@ -136,8 +142,8 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "Did Fengtians Unification Conference succeed?": "Did not happen"
         }
         if log_data["END"] < datetime.fromisoformat("1944-01-01"):
-            raise DateException        
-        
+            raise DateException
+
         config_data = read_config_file()
 
         if config_data["role"] in ["Kaiserdev", "Dev", "Contributor"]:
@@ -148,9 +154,10 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
         if "form_autosubmit" in config_data.keys():
             if config_data.get("form_autosubmit") is True:
                 WEBDRIVER_SCRIPT_AUTOSEND_FORM = True
+    # raising this here so it gets caught the caller in main.py and pass to the right handler
     except DateException:
         print("Log too short (pre-1944). This may have happened because your time limit was too short, the game crashed, or something else funny happened. If you're sure it's not the first one, please report to #data-gathering")
-        raise DateException # raising this here so it gets caught the caller in main.py and pass to the right handler
+        raise DateException
     except Exception as ex:
         logging.error(f"Error while creating initial dict before parsing the data {ex}", exc_info=True)
         raise
