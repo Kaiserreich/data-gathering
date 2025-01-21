@@ -254,19 +254,37 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["If the Reichspakt lost the 2nd Weltkrieg, when did they fall?"] = generate_text_field_output(m=m, log_data=log_data)
                 game_results["Who won the Russo-German part of the 2nd Weltkrieg?"] = "Russia"
                 game_results["When did the 2nd Weltkrieg end?"] = generate_text_field_output(m=m, log_data=log_data)
+                if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
+                    game_results["If Austria collapsed, who won the western front of the Second World War?"] = "Internationale"
+                    game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Russia"
+                else:
+                    game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Internationale"
+                    game_results["If Austria did not collapse, who won the eastern front of the Second World War?"] = "Russia"
 
             elif m := re.match(r'FRA FALLS', i):
                 game_results["Who won the Franco-German part of the 2nd Weltkrieg?"] = "Reichspakt"
                 game_results["If the Internationale lost the 2nd Weltkrieg, when did France fall?"] = generate_text_field_output(m=m, log_data=log_data)
                 game_results["When did the 2nd Weltkrieg end?"] = generate_text_field_output(m=m, log_data=log_data)
+                if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
+                    game_results["If Austria collapsed, who won the western front of the Second World War?"] = "Reichspakt"
+                else:
+                    game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Reichspakt"
 
             elif m := re.match(r'RUS LOSING WKII - MOSCOW', i):
                 if "GER FALLS" not in log_data.keys() and "FRA FALLS" in log_data.keys():
                     game_results["Who won the Russo-German part of the 2nd Weltkrieg?"] = "Reichspakt"
+                    if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
+                        game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Reichspakt"
+                    else:
+                        game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Reichspakt"
 
             elif m := re.match(r'RUS FALLS', i):
                 game_results["Who won the Russo-German part of the 2nd Weltkrieg?"] = "Reichspakt"
                 game_results["If Russia lost the 2nd Weltkrieg, when did they fall?"] = generate_text_field_output(m=m, log_data=log_data)
+                if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
+                    game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Reichspakt"
+                else:
+                    game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Reichspakt"
 
             elif m := re.match(r'ENG FALLS', i):
                 if "TREATY OF LONDON" not in log_data.keys():
@@ -495,6 +513,10 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'(.*) WINS LEP WAR', i):
                 game_results["Who was the victor of the League War?"] = m.group(1)
+                if "SHD INTERVENES IN LEP WAR" in log_data.keys():
+                    game_results["If Shandong intervened in the League War, who won?"] = m.group(1)
+                else:
+                    game_results["If Shandong didn't intervene in the League War, who won?"] = m.group(1)
                 if log_data[m.group(0)].year < 1938:
                     if log_data[m.group(0)].month in [1, 2, 3]:
                         if log_data[m.group(0)].year == 1936 or log_data[m.group(0)].year == 1937:
