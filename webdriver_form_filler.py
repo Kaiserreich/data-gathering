@@ -95,6 +95,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "Did the Netherlands go socialist?": "No",
             "Who controls most of the Indian subcontinent?": "Split between starting nations",
             "Which faction did Greece join?": "None",
+            "Which faction did Poland join?": "Reichspakt",
             "Who won the Spanish Civil War?": "Nobody",
             "When did the Spanish Civil War end?": "Did not end",
             "Who won the Indochinese War?": "Did not happen",
@@ -424,6 +425,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'GRE ALLIANCE - (.*)', i):
                 game_results["Which faction did Greece join?"] = m.group(1)
+
+            elif m := re.match(r'POL ALLIANCE - (.*)', i):
+                game_results["Which faction did Poland join?"] = m.group(1)
 
             elif m := re.match(r'FNG-QIE WAR START', i):
                 game_results["When did the Zhifeng War start?"] = generate_text_field_output(m=m, log_data=log_data)
