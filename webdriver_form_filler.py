@@ -516,7 +516,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 if "SHD INTERVENES IN LEP WAR" in log_data.keys():
                     game_results["If Shandong intervened in the League War, who won?"] = m.group(1)
                 else:
-                    game_results["If Shandong didn't intervene in the League War, who won?"] = m.group(1)
+                    game_results["If Shandong did not intervene in the League War, who won?"] = m.group(1)
                 if log_data[m.group(0)].year < 1938:
                     if log_data[m.group(0)].month in [1, 2, 3]:
                         if log_data[m.group(0)].year == 1936 or log_data[m.group(0)].year == 1937:
