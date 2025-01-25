@@ -366,6 +366,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["Who controls most of the Italian peninsula?"] = m.group(1)
                 game_results["When was Italy unified?"] = generate_text_field_output(m=m, log_data=log_data)
 
+            elif m := re.match(r'ARG POLITICAL PATH - (.*)', i):
+                game_results["What path did Argentina take?"] = m.group(1)
+
             elif m := re.match(r'(.*) WINS ARG-CHL WAR', i):
                 if 'ARGENTINA REUNIFIES IN PEACE' not in log_data.keys():
                     game_results["Who won the Argentinian-Chilean war?"] = m.group(1)
