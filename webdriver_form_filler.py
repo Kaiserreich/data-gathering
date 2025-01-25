@@ -277,7 +277,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                     if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
                         game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Reichspakt"
                     else:
-                        game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Reichspakt"
+                        game_results["If Austria did not collapse, who won the eastern front of the Second World War?"] = "Reichspakt"
 
             elif m := re.match(r'RUS FALLS', i):
                 game_results["Who won the Russo-German part of the 2nd Weltkrieg?"] = "Reichspakt"
@@ -285,7 +285,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
                     game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Reichspakt"
                 else:
-                    game_results["If Austria did not collapse, who won the western front of the Second World War?"] = "Reichspakt"
+                    game_results["If Austria did not collapse, who won the eastern front of the Second World War?"] = "Reichspakt"
 
             elif m := re.match(r'ENG FALLS', i):
                 if "TREATY OF LONDON" not in log_data.keys():
