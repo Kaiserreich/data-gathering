@@ -128,8 +128,8 @@ def process_error_log(filepath):
 
 def copy_log_file(run: int, instance: int, log_type: str):
     if log_type == "game_log":
-        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'game_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log')
-        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'error_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log')
+        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'game_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime("%Y%m%d_%H%M", time.localtime())}.log')
+        shutil.copyfile(Path(LOGS_PATH) / f'game_{instance}.log', Path(APPLICATION_PATH) / 'error_log_files' / f'game_log_instance_{instance}_run#{run}_{time.strftime("%Y%m%d_%H%M", time.localtime())}.log')
     elif log_type == "error_log":
         error_log_name = f"error_log_instance_{instance}_run#{run}_{time.strftime('%Y%m%d_%H%M', time.localtime())}.log"
         error_log_path = Path(APPLICATION_PATH) / 'error_log_files' / error_log_name
