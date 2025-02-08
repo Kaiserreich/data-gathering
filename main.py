@@ -299,10 +299,14 @@ def main():
                 print(f"{time.strftime('%H:%M', time.localtime())} - Processing {os.path.basename(filename)}")
                 with open(filename, 'r', encoding='utf-8-sig') as file:
                     log_file = file.read().split('\n')                                                           # Extract lines from game.log
-                    x = {line.split(";")[1]: line.split(";")[2] for line in log_file if "KR_Event_Logging" in line}
-                    data_to_report = dict(sorted(x.items(), key=lambda item: item[1][-4:]))                     # Sort log dict to get correct ending date
+                    x = {}
+                    for line in log_file:
+                        if "KR_Event_Logging" in line:
+                            key = line.split(";")[1]
+                            date = line.split("[")[2].strip("]")
+                            x[key] = date
+                    data_to_report = dict(sorted(x.items(), key=lambda item: item[1]))                     # Sort log dict to get correct ending date
                     data_to_report["END"] = list(data_to_report.values())[-1]
-                    data_to_report.update({line.split(": ")[1]: "8:00, 1 March, 1937" for line in log_file if "_data" in line})
                     for key, value in data_to_report.items():
                         if "_data" not in key:
                             print("\t\t{: <40} {: <40}".format(key, value))                                      # Print info in console

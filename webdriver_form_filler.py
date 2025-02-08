@@ -13,7 +13,7 @@ import logging                                                    # Logging
 import json                                                       # Work with config file
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 # from brotli import compress
 # import _cffi_backend
@@ -79,7 +79,14 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
     try:
         for key, value in log_data.items():
-            log_data[key] = datetime.strptime(value[value.index(',') + 2:], "%d %B, %Y")   # Create datetime object as key values
+            parts = value.rsplit(".", 1)  # Split into date and hour
+            date_part, hour_part = parts[0], parts[1]
+            if hour_part == "24":
+                date_obj = datetime.strptime(date_part, "%Y.%m.%d") + timedelta(days=1)
+            else:
+                date_obj = datetime.strptime(value, "%Y.%m.%d.%H")
+
+            log_data[key] = date_obj   # Create datetime object as key values
 
         game_results = {
             "When did you play to?": log_data["END"].year if log_data["END"] < datetime.fromisoformat("1951-01-01") else "Past 1950",
