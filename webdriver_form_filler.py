@@ -117,6 +117,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "Who won the Fourth Balkan War?": "Nobody",
             "When did the Fourth Balkan War end?": "Did not end",
             "When did the War in the Desert end?": "Did not end",
+            "Who unified Arabia?": "Nejd unified Arabia",
             "When did the Zhifeng War start?": "Did not happen",
             "When did the Second Sino-Japanese War start?": "Did not happen",
             "When did the Fading Sun happen?": "Did not happen",
@@ -416,6 +417,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                     game_results["Did Azerbaijan join the Ottomans against Persia?"] = "Yes, but OTT still lost the war"
                 else:
                     game_results["Did Azerbaijan join the Ottomans against Persia?"] = "Yes, and the war did not end"
+
+            elif m := re.match(r'SAUDIS UNIFY ARABIA', i):
+                game_results["Who unified Arabia?"] = "Saudis unified Arabia"
 
             elif m := re.match(r'(.*) UNIFIES INDIA', i):
                 if "INDIA IS CONQUERED BY FOREIGN POWER" not in log_data.keys():
