@@ -117,7 +117,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "Who won the Fourth Balkan War?": "Nobody",
             "When did the Fourth Balkan War end?": "Did not end",
             "When did the War in the Desert end?": "Did not end",
-            "Who unified Arabia?": "Nejd unified Arabia",
+            "Who unified Arabia?": "Jabal Shammar unified Arabia",
             "When did the Zhifeng War start?": "Did not happen",
             "When did the Second Sino-Japanese War start?": "Did not happen",
             "When did the Fading Sun happen?": "Did not happen",
