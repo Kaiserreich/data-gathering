@@ -98,7 +98,6 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "If Austria is alive, when did it join the Weltkrieg?": "Did not join",
             "Did National France land on the mainland?": "No",
             "Did Canada land on Britain?": "No",
-            "Did Azerbaijan join the Ottomans against Persia?": "No",
             "Did the Netherlands go socialist?": "No",
             "Who controls most of the Indian subcontinent?": "Split between starting nations",
             "Which faction did Greece join?": "None",
@@ -116,7 +115,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "Who won the Argentinian-Brazilian war?": "Did not happen",
             "Who won the Fourth Balkan War?": "Nobody",
             "When did the Fourth Balkan War end?": "Did not end",
-            "When did the War in the Desert end?": "Did not end",
+            "When did the Levant Crisis end?": "Did not end",
             "Who unified Arabia?": "Jabal Shammar unified Arabia",
             "When did the Zhifeng War start?": "Did not happen",
             "When did the Second Sino-Japanese War start?": "Did not happen",
@@ -188,13 +187,13 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
         OTT_revolters = []
         NFA_revolters = []
         if "OTT FEDERALIST" not in log_data.keys() and "RUS INTERVENE AGAINST OTT" not in log_data.keys():
-            game_results["If the Ottomans went Kemalist and Russia DID NOT intervene against them, who won the War in the Desert?"] = "Nobody"
+            game_results["If the Ottomans went Kemalist and Russia DID NOT intervene against them, who won the Levant Crisis?"] = "Nobody"
         elif "OTT FEDERALIST" not in log_data.keys() and "RUS INTERVENE AGAINST OTT" in log_data.keys():
-            game_results["If the Ottomans went Kemalist and Russia DID intervene against them, who won the War in the Desert?"] = "Nobody"
+            game_results["If the Ottomans went Kemalist and Russia DID intervene against them, who won the Levant Crisis?"] = "Nobody"
         elif "OTT FEDERALIST" in log_data.keys() and "RUS INTERVENE AGAINST OTT" not in log_data.keys():
-            game_results["If the Ottomans went Federalist and Russia DID NOT intervene against them, who won the War in the Desert?"] = "Nobody"
+            game_results["If the Ottomans went Federalist and Russia DID NOT intervene against them, who won the Levant Crisis?"] = "Nobody"
         elif "OTT FEDERALIST" in log_data.keys() and "RUS INTERVENE AGAINST OTT" in log_data.keys():
-            game_results["If the Ottomans went Federalist and Russia DID intervene against them, who won the War in the Desert?"] = "Nobody"
+            game_results["If the Ottomans went Federalist and Russia DID intervene against them, who won the Levant Crisis?"] = "Nobody"
 
         for i in log_data.keys():
             answer = None
@@ -397,26 +396,18 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'(.*) WINS IN THE LEVANT', i):
                 answer = m.group(1)
-                game_results["When did the War in the Desert end?"] = generate_text_field_output(m=m, log_data=log_data)
+                game_results["When did the Levant Crisis end?"] = generate_text_field_output(m=m, log_data=log_data)
 
                 if "OTT FEDERALIST" in log_data.keys():
                     if "RUS INTERVENE AGAINST OTT" in log_data.keys() and log_data["RUS INTERVENE AGAINST OTT"] < log_data[m.group(0)]:
-                        game_results["If the Ottomans went Federalist and Russia DID intervene against them, who won the War in the Desert?"] = answer
+                        game_results["If the Ottomans went Federalist and Russia DID intervene against them, who won the Levant Crisis?"] = answer
                     else:
-                        game_results["If the Ottomans went Federalist and Russia DID NOT intervene against them, who won the War in the Desert?"] = answer
+                        game_results["If the Ottomans went Federalist and Russia DID NOT intervene against them, who won the Levant Crisis?"] = answer
                 else:
                     if "RUS INTERVENE AGAINST OTT" in log_data.keys() and log_data["RUS INTERVENE AGAINST OTT"] < log_data[m.group(0)]:
-                        game_results["If the Ottomans went Kemalist and Russia DID intervene against them, who won the War in the Desert?"] = answer
+                        game_results["If the Ottomans went Kemalist and Russia DID intervene against them, who won the Levant Crisis?"] = answer
                     else:
-                        game_results["If the Ottomans went Kemalist and Russia DID NOT intervene against them, who won the War in the Desert?"] = answer
-
-            elif m := re.match(r'AZR JOINED OTT', i):
-                if "The Ottoman Empire WINS IN THE LEVANT" in log_data.keys():
-                    game_results["Did Azerbaijan join the Ottomans against Persia?"] = "Yes, and OTT won the war"
-                elif "The Cairo Pact WINS IN THE LEVANT" in log_data.keys():
-                    game_results["Did Azerbaijan join the Ottomans against Persia?"] = "Yes, but OTT still lost the war"
-                else:
-                    game_results["Did Azerbaijan join the Ottomans against Persia?"] = "Yes, and the war did not end"
+                        game_results["If the Ottomans went Kemalist and Russia DID NOT intervene against them, who won the Levant Crisis?"] = answer
 
             elif m := re.match(r'SAUDIS UNIFY ARABIA', i):
                 game_results["Who unified Arabia?"] = "Saudis unified Arabia"
