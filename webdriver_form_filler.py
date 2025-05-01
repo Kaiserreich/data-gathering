@@ -434,6 +434,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'POL ALLIANCE - Donau-Adriabund', i):
                 game_results["Did Poland join the Donau-Adriabund?"] = "Yes"
 
+            elif m := re.match(r'BAT POLITICAL PATH - (.*)', i):
+                game_results["Which political path did the United Baltic Duchy go down?"] = m.group(1)
+
             elif m := re.match(r'FNG-QIE WAR START', i):
                 game_results["When did the Zhifeng War start?"] = generate_text_field_output(m=m, log_data=log_data)
 
