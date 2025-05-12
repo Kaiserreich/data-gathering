@@ -336,6 +336,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'AUSTRIA IN 2WK', i):
                 game_results["If Austria is alive, when did it join the Weltkrieg?"] = generate_text_field_output(m=m, log_data=log_data)
 
+            elif m := re.match(r'AUSTRIA ANNEXED INTO GERMANY', i):
+                game_results["If Austria is alive, when did it join the Weltkrieg?"] = "Austria annexed themselves into Germany"
+
             elif m := re.match(r'AUS FALLS', i):
                 game_results["If Austria intervened in the Weltkrieg and lost, when did they fall?"] = generate_text_field_output(m=m, log_data=log_data)
                 if "PACT IN 2WK" in log_data.keys() and log_data["AUS FALLS"] > log_data["PACT IN 2WK"]:
@@ -436,6 +439,12 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'BAT POLITICAL PATH - (.*)', i):
                 game_results["Which political path did the United Baltic Duchy go down?"] = m.group(1)
+
+            elif m := re.match(r'PHI Path - (.*)', i):
+                game_results["What political path did the Philippines go down in 1939?"] = m.group(1)
+
+            elif m := re.match(r'PHI ForPol - (.*)', i):
+                game_results["PHI Game Progression"] = m.group(1)
 
             elif m := re.match(r'FNG-QIE WAR START', i):
                 game_results["When did the Zhifeng War start?"] = generate_text_field_output(m=m, log_data=log_data)
