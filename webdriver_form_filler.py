@@ -305,7 +305,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["If the Entente is alive, when did it join the Weltkrieg?"] = generate_text_field_output(m=m, log_data=log_data)
 
             elif m := re.match(r'CAN FALLS - BY (.*)', i):
-                if m.group(1) not in ["USA", "CSA", "PSA", "TEX", "NEE", "GER", "AUS", "ENG", "FRA"]:
+                if m.group(1) not in ["USA", "WCA", "APG", "ACC", "NEE", "GER", "AUS", "ENG", "FRA"]:
                     answer = "Someone else"
                 elif m.group(1) == "FRA" or m.group(1) == "ENG":
                     answer = "Internationale"
