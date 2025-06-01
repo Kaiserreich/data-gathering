@@ -195,6 +195,10 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
         elif "OTT FEDERALIST" in log_data.keys() and "RUS INTERVENE AGAINST OTT" in log_data.keys():
             game_results["If the Ottomans went Federalist and Russia DID intervene against them, who won the Levant Crisis?"] = "Nobody"
 
+        # IMRO initial answer
+        # if "IMRO REBELLION START" in log_data.keys():
+        #     game_results["If the Pact won against Bulgaria, who won the IMRO Rebellion?"] = "Serbia"
+
         for i in log_data.keys():
             answer = None
 
@@ -611,6 +615,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'HNN Power Struggle - (.*)', i):
                 game_results["Hunan Power Struggle"] = m.group(1)
+
+            # elif m := re.match(r'IMRO REBELLION - (.*)', i):
+            #     game_results["If the Pact won against Bulgaria, who won the IMRO Rebellion?"] = m.group(1)
 
     except Exception as ex:
         logging.error(f"Error while parsing the data and preparing questions {ex}", exc_info=True)
