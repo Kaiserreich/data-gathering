@@ -619,6 +619,9 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'IMRO REBELLION - (.*)', i):
                 game_results["If the Pact won against Bulgaria, who won the IMRO Rebellion?"] = m.group(1)
 
+            elif m := re.match(r'BRA ruling party logging - (.*)', i):
+                game_results["As of 1.1.1939, what is the current ruling government of Brazil?"] = m.group(1)
+
     except Exception as ex:
         logging.error(f"Error while parsing the data and preparing questions {ex}", exc_info=True)
         raise
