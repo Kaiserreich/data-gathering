@@ -137,7 +137,6 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "If Poland revolted, which side rebelled?": "Poland did not rebel",
             "SHX Game Progression": "default answer",
             "Who won German-Japanese war?": "Did not happen",
-            "Did the GXC civil war happen?": "No",
             "When was Italy unified?": "Did not happen",
             "What path did Germany take?": "Schleicher Cabinet",
             "Has Scandinavia been formed?": "No",
@@ -560,14 +559,6 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'FENGTIAN UNIFICATION CONFERENCE RESULT - (.*)', i):
                 game_results["Did Fengtians Unification Conference succeed?"] = m.group(1)
-
-            elif m := re.match(r'GXC CIVIL WAR WINNER - (.*)', i):
-                game_results["Did the GXC civil war happen?"] = "Yes"
-                game_results["Who won the GXC civil war?"] = m.group(1)
-                game_results["When did the GXC civil war end?"] = generate_text_field_output(m=m, log_data=log_data)
-
-            elif m := re.match(r'GXC CIVIL WAR AVOIDED - (.*)', i):
-                game_results["Did the GXC civil war happen?"] = f"Avoided - {m.group(1)}"
 
             elif m := re.match(r'RUSSIA POLITICAL PATH - (.*)', i):
                 game_results["What path did Russia take?"] = m.group(1)
