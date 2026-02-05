@@ -146,7 +146,6 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "If Ireland gets a guarantee, who is it from?": "Ireland did not get a guarantee",
             "Did Ireland remove the Ulster Privileges?": "No",
             "What path did Russia take?": "No path was decided on",
-            "Did Fengtians Unification Conference succeed?": "Did not happen"
         }
         if log_data["END"] < datetime.fromisoformat("1944-01-01"):
             raise DateException
@@ -170,6 +169,8 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
         raise
 
     try:
+        wk2_start_date = False
+        wk2_end_date = False
         # log_data_metrics = [key for key in log_data.keys() if [i for i in ["KR_tension_data", "KR_division_data", "KR_industry_data"] if i in key]]                # Metrics dict                                                                                                                       # Original dict that contains metrics
         log_data = {key: value for key, value in log_data.items() if not [i for i in ["KR_tension_data", "KR_division_data", "KR_industry_data"] if i in key]}     # Non-metrics dict
         # ACW initial answers
@@ -249,6 +250,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
         # Second Weltkrieg
 
             elif m := re.match(r'THE SECOND WELTKRIEG', i):
+                wk2_start_date = log_data[m.group(0)]
                 if log_data[m.group(0)].year < 1939:
                     game_results["When did the 2nd Weltkrieg start?"] = "Before 1939"
                 elif log_data[m.group(0)].year >= 1941:
@@ -265,6 +267,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["If the Reichspakt lost the 2nd Weltkrieg, when did they fall?"] = generate_text_field_output(m=m, log_data=log_data)
                 game_results["Who won the Russo-German part of the 2nd Weltkrieg?"] = "Russia"
                 game_results["When did the 2nd Weltkrieg end?"] = generate_text_field_output(m=m, log_data=log_data)
+                wk2_end_date = log_data[m.group(0)]
                 if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
                     game_results["If Austria collapsed, who won the western front of the Second World War?"] = "Internationale"
                     game_results["If Austria collapsed, who won the eastern front of the Second World War?"] = "Russia"
@@ -276,6 +279,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 game_results["Who won the Franco-German part of the 2nd Weltkrieg?"] = "Reichspakt"
                 game_results["If the Internationale lost the 2nd Weltkrieg, when did France fall?"] = generate_text_field_output(m=m, log_data=log_data)
                 game_results["When did the 2nd Weltkrieg end?"] = generate_text_field_output(m=m, log_data=log_data)
+                wk2_end_date = log_data[m.group(0)]
                 if "AUS ENACTED MILITARY OCCUPATION" in log_data.keys():
                     game_results["If Austria collapsed, who won the western front of the Second World War?"] = "Reichspakt"
                 else:
@@ -557,9 +561,6 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                 else:
                     game_results["When did the League War end?"] = "1938 or later"
 
-            elif m := re.match(r'FENGTIAN UNIFICATION CONFERENCE RESULT - (.*)', i):
-                game_results["Did Fengtians Unification Conference succeed?"] = m.group(1)
-
             elif m := re.match(r'RUSSIA POLITICAL PATH - (.*)', i):
                 game_results["What path did Russia take?"] = m.group(1)
 
@@ -613,6 +614,22 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             elif m := re.match(r'BRA ruling party logging - (.*)', i):
                 game_results["As of 1.1.1939, what is the current ruling government of Brazil?"] = m.group(1)
 
+        ### 1.6 - Southern China
+            elif m := re.match(r'FNG TENSIONS IN MANCHURIA - (.*)', i):
+                game_results["FNG - What was the Outcome of the Tensions in Manchuria?"] = m.group(1)
+
+            elif m := re.match(r'FNG GREAT DECISION - (.*)', i):
+                game_results["FNG - What was the Outcome of the Great Decision?"] = m.group(1)
+
+            elif m := re.match(r'GXC GAME PROGRESS - (.*)', i):
+                game_results["GXC Game Progression"] = m.group(1)
+
+            elif m := re.match(r'YUN GAME PROGRESS - (.*)', i):
+                game_results["YUN Game Progression"] = m.group(1)
+
+            elif m := re.match(r'NEP CONSPIRACY OUTCOME - (.*)', i):
+                game_results["NEP - What was the outcome of Darjeeling Conspiracy?"] = m.group(1)
+
     except Exception as ex:
         logging.error(f"Error while parsing the data and preparing questions {ex}", exc_info=True)
         raise
@@ -644,6 +661,10 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
     # division_data = compress(compress_data_dict(division_data).encode('ascii'))
 
     # return [game_results, OTT_revolters, tension_data, industry_data, division_data, NFA_revolters]
+    if wk2_start_date and wk2_end_date:
+        delta = wk2_end_date - wk2_start_date
+        delta_months = int(delta.days / 30)
+        game_results["How many months did the 2nd Weltkrieg last?"] = delta_months
     return [game_results, OTT_revolters, NFA_revolters]
 
 
