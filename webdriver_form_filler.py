@@ -127,6 +127,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "When was Shanxi annexed?": "Did not happen",
             "Did Japan go to war with Russia?": "No",
             "Who united China?": "Nobody",
+            "When did China Unite?": "Did not happen",
             "Who won the Xinjiang Civil War?": "Nobody",
             "When did the Xinjiang Civil War end?": "Did not end",
             "Who won the Northwestern War?": "Nobody",
@@ -146,6 +147,7 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
             "If Ireland gets a guarantee, who is it from?": "Ireland did not get a guarantee",
             "Did Ireland remove the Ulster Privileges?": "No",
             "What path did Russia take?": "No path was decided on",
+            "When did China Fall to Japan?": "Did not happen",
         }
         if log_data["END"] < datetime.fromisoformat("1944-01-01"):
             raise DateException
@@ -465,13 +467,21 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
                     game_results["When did the Second Sino-Japanese War start?"] = log_data[m.group(0)].year
 
             elif m := re.match(r'JAPAN FADING SUN', i):
-                game_results["How far did Japan push into China"] = "Pushed back (with or without the Fading Sun)"
+                game_results["How far did Japan push into China"] = "Fading Sun"
                 if log_data[m.group(0)].year < 1938:
                     game_results["When did the Fading Sun happen?"] = "Before 1938"
                 elif log_data[m.group(0)].year > 1945:
                     game_results["When did the Fading Sun happen?"] = "After 1945"
                 else:
                     game_results["When did the Fading Sun happen?"] = log_data[m.group(0)].year
+
+            elif m := re.match(r'CUF FALLS', i):
+                if log_data[m.group(0)].year < 1938:
+                    game_results["When did China Fall to Japan?"] = "Before 1938"
+                elif log_data[m.group(0)].year > 1945:
+                    game_results["When did China Fall to Japan?"] = "After 1945"
+                else:
+                    game_results["When did China Fall to Japan?"] = log_data[m.group(0)].year
 
             elif m := re.match(r'SZC FALLS', i):
                 if log_data[m.group(0)].year < 1938:
@@ -524,10 +534,16 @@ def extract_data_for_webdriver_script(log_data: dict) -> list:
 
             elif m := re.match(r'CHINA UNITED BY (.*)', i):
                 game_results["Who united China?"] = m.group(1)
+                if log_data[m.group(0)].year < 1938:
+                    game_results["When did China Unite?"] = "Before 1938"
+                elif log_data[m.group(0)].year > 1945:
+                    game_results["When did China Unite?"] = "After 1945"
+                else:
+                    game_results["When did China Unite?"] = log_data[m.group(0)].year
 
             elif m := re.match(r'JAP WAR PROGRESS - (.*)', i):
                 if "JAPAN FADING SUN" in log_data.keys():
-                    game_results["How far did Japan push into China"] = "Pushed back (with or without the Fading Sun)"
+                    game_results["How far did Japan push into China"] = "Fading Sun"
                 elif "JAP ICHI-GOU" in log_data.keys():
                     game_results["How far did Japan push into China"] = m.group(1)
 
